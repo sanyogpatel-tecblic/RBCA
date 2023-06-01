@@ -1,12 +1,16 @@
 package main
 
-import "log"
+import (
+	"fmt"
+
+	"github.com/sanyogpatel-tecblic/RBCA/routes"
+)
+
+// Define the User model
 
 func main() {
+	fmt.Println("Server is getting started...")
+	fmt.Println("Listening at port 8080 ...")
 
-	dsn := "host=localhost user=postgres dbname=student password=root port=5432 sslmode=disable"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatal(err)
-	}
+	routes.Routes()
 }
