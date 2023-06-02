@@ -8,51 +8,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetUserHandler(db *gorm.DB) gin.HandlerFunc {
+func Approve(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		// Fetch the access token from the request header
-		accessToken := c.GetHeader("Authorization")
-		if accessToken == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing access token"})
-			return
-		}
-
-		// Verify the access token
-		claims, err := VerifyAccessToken(accessToken)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-			return
-		}
-
-		// Get the user ID from the claims
-		userID, ok := claims["userID"].(string)
-		if !ok {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID in access token"})
-			return
-		}
-
-		var user2 models.User
-		err = db.Where("id = ?", userID).First(&user2).Error
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
-			return
-		}
-
-		if user2.Role != "manager" {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
-			return
-		}
-
-		// Retrieve the list of users from the database
-		var users []models.User
-		result := db.Find(&users)
-		if result.Error != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve users"})
-			return
-		}
-
-		c.JSON(http.StatusOK, users)
 	}
 }
 

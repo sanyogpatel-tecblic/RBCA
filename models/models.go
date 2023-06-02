@@ -7,4 +7,11 @@ type User struct {
 	Username string
 	Password string
 	Role     string
+	Approved int
+	Deleted  int `gorm:"default:0"`
+}
+
+type APIError struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }

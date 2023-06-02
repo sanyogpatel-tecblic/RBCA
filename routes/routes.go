@@ -25,9 +25,11 @@ func Routes() {
 
 	// // Apply RBAC to the endpoints
 	// router.POST("/users", LoginHandler(db, []string{"admin"}), CreateUserHandler(db))
+	router.DELETE("/users/:id", endpoints.DeleteUsers(db))
 	router.GET("/users", middleware.AuthMiddleware(db), endpoints.GetUserHandler(db))
 	router.POST("/users", middleware.AuthMiddleware(db), endpoints.CreateUserHandler(db))
 	router.POST("/login", endpoints.LoginHandler(db), endpoints.CreateAccessTokenHandler)
+	router.POST("/register", endpoints.Register(db))
 
 	// Run the server
 	router.Run(":8080")
