@@ -31,6 +31,9 @@ func Routes() {
 	router.POST("/login", endpoints.LoginHandler(db), endpoints.CreateAccessTokenHandler)
 	router.POST("/register", endpoints.Register(db))
 
+	//admin
+	router.GET("/users/requests", middleware.AuthMiddleware(db), endpoints.GetAllRequests(db))
+
 	// Run the server
 	router.Run(":8080")
 }
