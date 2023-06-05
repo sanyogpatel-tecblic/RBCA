@@ -105,7 +105,6 @@ func LoginHandler(db *gorm.DB) gin.HandlerFunc {
 		}
 		// Store the authenticated user in the context for future use
 		c.Set("user", user)
-
 		// Continue to the next middleware or handler
 		c.Next()
 	}

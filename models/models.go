@@ -6,6 +6,7 @@ type User struct {
 	gorm.Model
 	Username string
 	Password string
+	Email    string
 	Role     string
 	Approved int
 	Deleted  int `gorm:"default:0"`

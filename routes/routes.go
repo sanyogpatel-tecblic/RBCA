@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sanyogpatel-tecblic/RBCA/endpoints"
 	"github.com/sanyogpatel-tecblic/RBCA/middleware"
-	"github.com/sanyogpatel-tecblic/RBCA/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -20,7 +19,7 @@ func Routes() {
 	}
 
 	// Auto-migrate the User model to create the "users" table if it doesn't exist
-	db.AutoMigrate(&models.User{})
+
 	router := gin.Default()
 
 	// // Apply RBAC to the endpoints
