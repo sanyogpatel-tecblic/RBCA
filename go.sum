@@ -9,19 +9,7 @@ github.com/andybalholm/cascadia v1.1.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9Pq
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.8.0 h1:ea0Xadu+sHlu7x5O3gKhRpQ1IKiMrSiHttPF0ybECuA=
 github.com/bytedance/sonic v1.8.0/go.mod h1:i736AoUSYt75HyZLoJW9ERYxcy6eaN6h4BZXU064P/U=
-github.com/casbin/casbin v1.9.1 h1:ucjbS5zTrmSLtH4XogqOG920Poe6QatdXtz1FEbApeM=
-github.com/casbin/casbin v1.9.1/go.mod h1:z8uPsfBJGUsnkagrt3G8QvjgTKFMBJ32UP8HpZllfog=
-github.com/casbin/casbin/v2 v2.2.2/go.mod h1:XXtYGrs/0zlOsJMeRteEdVi/FsB0ph7KgNfjoCoJUD8=
-github.com/casbin/casbin/v2 v2.69.1 h1:R3e7uveIRN5Pdqvq0GXEhXmn7HyfoEVjp21/mgEXbdI=
-github.com/casbin/casbin/v2 v2.69.1/go.mod h1:vByNa/Fchek0KZUgG5wEsl7iFsiviAYKRtgrQfcJqHg=
-github.com/casbin/casbin/v3 v3.0.0-beta.7 h1:siS3e6cRtuyFlshUgJfw0wnWuK3z3U/ald0C8Jtof24=
-github.com/casbin/casbin/v3 v3.0.0-beta.7/go.mod h1:69HoI+h4yMUTydUMxT7VQh7FgGpoJsB/ZskkVGcvasQ=
-github.com/casbin/gorm-adapter v1.0.0 h1:s6U2gJQ4reenRde0L85YsrwNt8k0bv6iUAfRigi1/cM=
-github.com/casbin/gorm-adapter v1.0.0/go.mod h1:1E0t3/djAo+vIvDfNPGigJjLMyoh2XNesXMW69R3ykA=
-github.com/casbin/gorm-adapter/v2 v2.1.0 h1:wBimcRJ4V/Dq5o95OIBzeM6vvxNfjzCV235biWoSO4I=
-github.com/casbin/gorm-adapter/v2 v2.1.0/go.mod h1:Sy5LYivXiUVRvPZFasa6puLle0RaxNpV2TJ7yzlQkZc=
-github.com/casbin/gorm-adapter/v3 v3.17.0 h1:nEUsNwhwWoZ9D3UY3tFKYHuN+Oxa3z2Ubx0gRB4AkkU=
-github.com/casbin/gorm-adapter/v3 v3.17.0/go.mod h1:YB/X0JH+tYaz60V+78JXACzz98hZLwtQNOA1s+/Y9SY=
+    
 github.com/chenzhuoyu/base64x v0.0.0-20211019084208-fb5309c8db06/go.mod h1:DH46F32mSOjUmXrMHnKwZdA8wcEefY7UVqBKYGjpdQY=
 github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 h1:qSGYFH7+jGhDF8vLC+iwCD4WpbV1EBDSzWkJODFLams=
 github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311/go.mod h1:b583jCggY9gE99b6G5LEC39OIiVsWj+R97kbl5odCEk=

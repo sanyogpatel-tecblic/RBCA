@@ -11,12 +11,6 @@ require (
 require (
 	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
 	github.com/bytedance/sonic v1.8.0 // indirect
-	github.com/casbin/casbin v1.9.1 // indirect
-	github.com/casbin/casbin/v2 v2.69.1 // indirect
-	github.com/casbin/casbin/v3 v3.0.0-beta.7 // indirect
-	github.com/casbin/gorm-adapter v1.0.0 // indirect
-	github.com/casbin/gorm-adapter/v2 v2.1.0 // indirect
-	github.com/casbin/gorm-adapter/v3 v3.17.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -63,5 +57,5 @@ require (
 	modernc.org/libc v1.22.2 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
 	modernc.org/memory v1.5.0 // indirect
-	modernc.org/sqlite v1.20.3 // indirect
+
 )

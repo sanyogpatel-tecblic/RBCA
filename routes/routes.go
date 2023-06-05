@@ -33,6 +33,7 @@ func Routes() {
 
 	//admin
 	router.GET("/users/requests", middleware.AuthMiddleware(db), endpoints.GetAllRequests(db))
+	router.PATCH("/users/approve/:id", middleware.AuthMiddleware(db), endpoints.Approve(db))
 
 	// Run the server
 	router.Run(":8080")

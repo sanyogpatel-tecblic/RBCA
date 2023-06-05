@@ -43,8 +43,8 @@ func GetUserHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		if user.Approved == 0 {
-			c.JSON(http.StatusOK, gin.H{"message": "You are still not approved to access this feature please contact ADMINISTRATION for further process."})
+		if user.Approved == 0 && user.Role != "admin" {
+			c.JSON(http.StatusOK, gin.H{"message": "You do not hav approval to access this feature please contact ADMINISTRATION for further process."})
 			return
 		}
 
