@@ -18,8 +18,6 @@ func Routes() {
 		log.Fatal(err)
 	}
 
-	// Auto-migrate the User model to create the "users" table if it doesn't exist
-
 	router := gin.Default()
 
 	// // Apply RBAC to the endpoints
@@ -33,6 +31,14 @@ func Routes() {
 	//admin
 	router.GET("/users/requests", middleware.AuthMiddleware(db), endpoints.GetAllRequests(db))
 	router.PATCH("/users/approve/:id", middleware.AuthMiddleware(db), endpoints.Approve(db))
+
+	//react
+	router.POST("/topic/react", middleware.AuthMiddleware(db), endpoints.AddReactTopics(db))
+	router.GET("/topic/react", middleware.AuthMiddleware(db), endpoints.GetReactTopicsHandler(db))
+
+	//node
+	router.POST("/topic/node", middleware.AuthMiddleware(db), endpoints.AddNodeTopics(db))
+	router.GET("/topic/node", middleware.AuthMiddleware(db), endpoints.GetNodeTopicsHandler(db))
 
 	// Run the server
 	router.Run(":8080")

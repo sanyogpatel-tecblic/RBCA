@@ -22,5 +22,6 @@ func main() {
 	fmt.Println("Server is getting started...")
 	fmt.Println("Listening at port 8080 ...")
 	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Topic{})
 	routes.Routes()
 }

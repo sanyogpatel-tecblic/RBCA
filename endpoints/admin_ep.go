@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sanyogpatel-tecblic/RBCA/email"
 	"github.com/sanyogpatel-tecblic/RBCA/models"
 	"gorm.io/gorm"
 )
@@ -59,6 +60,61 @@ func Approve(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 			return
 		}
+		email.SendEmailAlert(user.Email, "You Are Approved! ", "Now You Can Access APIs")
+		c.JSON(http.StatusOK, gin.H{"message": "User Approoved Successfully"})
+	}
+}
+func Reject(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		var users models.User
+		accessToken := c.GetHeader("Authorization")
+		if accessToken == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing access token"})
+			return
+		}
+
+		// Verify the access token
+		claims, err := VerifyAccessToken(accessToken)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Get the user ID from the claims
+		userID, ok := claims["userID"].(string)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID in access token"})
+			return
+		}
+
+		result := db.Where("id = ?", userID).Find(&users)
+
+		if users.Role != "admin" {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+			return
+		}
+
+		var user models.User
+
+		id := c.Param("id")
+
+		result = db.First(&user, id)
+
+		if result.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+			return
+		}
+
+		user.Approved = 1
+
+		result = db.Save(&user)
+
+		if result.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+			return
+		}
+		email.SendEmailAlert(user.Email, "You Are Approved! ", "Now You Can Access APIs")
 		c.JSON(http.StatusOK, gin.H{"message": "User Approoved Successfully"})
 	}
 }

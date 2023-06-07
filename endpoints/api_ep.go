@@ -1,13 +1,11 @@
 package endpoints
 
 import (
-	"log"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sanyogpatel-tecblic/RBCA/email"
 	"github.com/sanyogpatel-tecblic/RBCA/models"
-	"gopkg.in/gomail.v2"
 	"gorm.io/gorm"
 )
 
@@ -41,11 +39,16 @@ func GetUserHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		if user.Approved == 0 && user.Role != "admin" && user.Role != "manager" {
+		if user.Approved != 1 && user.Role != "admin" {
 			// Send email alert
-			sendEmailAlert(user.Email, "You do not have approval to access this feature. Please contact ADMINISTRATION for further process")
+			email.SendEmailAlert(user.Email, "GetUserHandler API was called.....", "You do not have approval to access this feature. Please contact ADMINISTRATION for further process")
 
 			c.JSON(http.StatusOK, gin.H{"message": "You do not have approval to access this feature. Please contact ADMINISTRATION for further process."})
+			return
+		}
+		if user.Role != "admin" && user.Role != "manager" {
+			email.SendEmailAlert(user.Email, "GetUserHandler API was called.....", "You are not allowed to access this feature. Please contact ADMINISTRATION for further asistance.")
+			c.JSON(http.StatusOK, gin.H{"message": "You are not allowed to access this feature. Please contact ADMINISTRATION for further process."})
 			return
 		}
 
@@ -57,36 +60,5 @@ func GetUserHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, users)
-	}
-}
-
-func sendEmailAlert(email string, error string) {
-	// Set up SMTP connection details for Gmail
-	smtpHost := "smtp.gmail.com"
-	smtpPort := 587
-	senderEmail := "sanyogp.249@gmail.com"
-	senderPassword := "udkaoitkaqgfipyh"
-	recipientEmail := "21msit037@charusat.edu.in"
-
-	// Create a new email message
-	m := gomail.NewMessage()
-	m.SetHeader("From", senderEmail)
-	m.SetHeader("To", recipientEmail)
-	m.SetHeader("Subject", "API Alert")
-
-	// Get the current time with microseconds
-	timestamp := time.Now().Format("2006-01-02 15:04:05.000000")
-
-	// Add the timestamp to the email body
-	body := "The GetUserHandler API was called at " + timestamp + error
-	m.SetBody("text/plain", body)
-
-	// Set up the SMTP authentication
-	d := gomail.NewDialer(smtpHost, smtpPort, senderEmail, senderPassword)
-
-	// Send the email
-	if err := d.DialAndSend(m); err != nil {
-		// Handle the error, e.g., log it or return an error response
-		log.Println("Failed to send email alert:", err)
 	}
 }

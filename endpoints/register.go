@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sanyogpatel-tecblic/RBCA/email"
 	"github.com/sanyogpatel-tecblic/RBCA/models"
 	"gorm.io/gorm"
 )
@@ -49,8 +50,12 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			json.NewEncoder(c.Writer).Encode(apierror)
 			return
 		}
+		email.SendEmailAlert2("ad2491min@gmail.com", "ad2491min@gmail.com", "New user have just registered please have a look at your pending Requests!", newuser.Username)
+
+		email.SendEmailAlert(newuser.Email, "Register API was Called....", "You have succesfully registered, please wait till admin approves you!")
 
 		// Return success response
 		c.JSON(http.StatusOK, newuser)
+
 	}
 }
