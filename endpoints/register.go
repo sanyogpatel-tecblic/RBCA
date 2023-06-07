@@ -53,9 +53,7 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 		email.SendEmailAlert2("ad2491min@gmail.com", "ad2491min@gmail.com", "New user have just registered please have a look at your pending Requests!", newuser.Username)
 
 		email.SendEmailAlert(newuser.Email, "Register API was Called....", "You have succesfully registered, please wait till admin approves you!")
-
 		// Return success response
 		c.JSON(http.StatusOK, newuser)
-
 	}
 }
