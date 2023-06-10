@@ -1,14 +1,36 @@
 package endpoints
 
 import (
-	"encoding/json"
+	"math/rand"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanyogpatel-tecblic/RBCA/email"
 	"github.com/sanyogpatel-tecblic/RBCA/models"
+	"github.com/sfreiberg/gotwilio"
 	"gorm.io/gorm"
 )
+
+const (
+	twilioAccountSID  = "ACffe48560a5e6d7ea899877beb97ea827"
+	twilioAuthToken   = "5104c9e2d7e488abd2255971a869960a"
+	twilioPhoneNumber = "+1 361 450 7844"
+)
+
+// Store OTP for each registration request
+var otpStore = make(map[string]string)
+
+func generateOTP() string {
+	otp := rand.Intn(900000) + 100000
+	return strconv.Itoa(otp)
+}
+
+func sendOTP(phoneNumber string, otp string) error {
+	twilioClient := gotwilio.NewTwilioClient(twilioAccountSID, twilioAuthToken)
+	_, _, err := twilioClient.SendSMS(twilioPhoneNumber, phoneNumber, "Your OTP for registration is: "+otp, "", "")
+	return err
+}
 
 func Register(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -18,22 +40,40 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		if newuser.Username == "" {
-			apierror := models.APIError{
-				Code:    http.StatusBadRequest,
-				Message: "username is required",
+
+		// Check if OTP is provided in the query parameters
+		enteredOTP := c.Query("otp")
+		if enteredOTP == "" {
+			// Generate OTP
+			otp := generateOTP()
+
+			// Store the generated OTP for this registration request
+			otpStore[newuser.Mobile] = otp
+
+			// Send OTP to the user's mobile number
+			err := sendOTP(newuser.Mobile, otp)
+			if err != nil {
+				apierror := models.APIError{
+					Code:    http.StatusInternalServerError,
+					Message: "Failed to send OTP: " + err.Error(),
+				}
+				c.JSON(http.StatusInternalServerError, apierror)
+				return
 			}
-			c.Header(apierror.Message, "")
-			json.NewEncoder(c.Writer).Encode(apierror)
+
+			// Return success response with the message to provide OTP
+			c.JSON(http.StatusOK, gin.H{"message": "OTP sent. Please provide the OTP to complete registration."})
 			return
 		}
-		if newuser.Password == "" {
+
+		// OTP provided, verify it
+		expectedOTP, ok := otpStore[newuser.Mobile]
+		if !ok || enteredOTP != expectedOTP {
 			apierror := models.APIError{
 				Code:    http.StatusBadRequest,
-				Message: "password is required",
+				Message: "Invalid OTP",
 			}
-			c.Header(apierror.Message, "password is required 2")
-			json.NewEncoder(c.Writer).Encode(apierror)
+			c.JSON(http.StatusBadRequest, apierror)
 			return
 		}
 
@@ -46,13 +86,17 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 				Code:    http.StatusInternalServerError,
 				Message: "Failed to create user: " + result.Error.Error(),
 			}
-			c.Header(apierror.Message, "")
-			json.NewEncoder(c.Writer).Encode(apierror)
+			c.JSON(http.StatusInternalServerError, apierror)
 			return
 		}
-		email.SendEmailAlert2("ad2491min@gmail.com", "ad2491min@gmail.com", "New user have just registered please have a look at your pending Requests!", newuser.Username)
 
-		email.SendEmailAlert(newuser.Email, "Register API was Called....", "You have succesfully registered, please wait till admin approves you!")
+		// Send email notifications
+		email.SendEmailAlert2("ad2491min@gmail.com", "ad2491min@gmail.com", "New user has just registered, please have a look at your pending Requests!", newuser.Username)
+		email.SendEmailAlert(newuser.Email, "Register API was called", "You have successfully registered. Please wait until the admin approves you.")
+
+		// Remove the OTP from the store after successful registration
+		delete(otpStore, newuser.Mobile)
+
 		// Return success response
 		c.JSON(http.StatusOK, newuser)
 	}

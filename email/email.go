@@ -23,7 +23,6 @@ func SendEmailAlert(email string, apiinfo string, Message string) {
 
 	response, err := client.Send(message)
 	if err != nil {
-
 		log.Println("Failed to send email alert:", err)
 		return
 	}

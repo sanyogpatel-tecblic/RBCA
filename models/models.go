@@ -9,7 +9,9 @@ type User struct {
 	Email    string
 	Role     string
 	Approved int
-	Deleted  int `gorm:"default:0"`
+	Deleted  int    `gorm:"default:0"`
+	OTP      string `json:"otp"`
+	Mobile   string `json:"mobile"`
 }
 
 type Topic struct {

@@ -40,6 +40,8 @@ func Routes() {
 	router.POST("/topic/node", middleware.AuthMiddleware(db), endpoints.AddNodeTopics(db))
 	router.GET("/topic/node", middleware.AuthMiddleware(db), endpoints.GetNodeTopicsHandler(db))
 
+	router.GET("/check-cache", endpoints.CheckCacheHandler)
+
 	// Run the server
 	router.Run(":8080")
 }
