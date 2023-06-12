@@ -156,7 +156,7 @@ func GetReactTopicsHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// Retrieve the list of react topics from the database
+		// Retrieve the list of react topics from the database even if topics are added by differnet react users
 		var topics []models.Topic
 		result := db.Joins("JOIN users ON users.id = topics.user_id").Where("users.role = ?", "react").Find(&topics)
 		if result.Error != nil {

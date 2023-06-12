@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	twilioAccountSID  = "ACffe48560a5e6d7ea899877beb97ea827"
-	twilioAuthToken   = "5104c9e2d7e488abd2255971a869960a"
-	twilioPhoneNumber = "+1 361 450 7844"
+	twilioAccountSID  = "ACe1005348d84ee8b6152aaedeef0dfbd1"
+	twilioAuthToken   = "6054fd4d8d7c1ea9aa8bb796239a4059"
+	twilioPhoneNumber = "+1 361 301 1373"
 )
 
 // Store OTP for each registration request
