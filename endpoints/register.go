@@ -14,7 +14,7 @@ import (
 
 const (
 	twilioAccountSID  = "ACe1005348d84ee8b6152aaedeef0dfbd1"
-	twilioAuthToken   = "6054fd4d8d7c1ea9aa8bb796239a4059"
+	twilioAuthToken   = "d8a5aa894cd228d18b4dab33826061ad"
 	twilioPhoneNumber = "+1 361 301 1373"
 )
 
@@ -29,6 +29,7 @@ func generateOTP() string {
 func sendOTP(phoneNumber string, otp string) error {
 	twilioClient := gotwilio.NewTwilioClient(twilioAccountSID, twilioAuthToken)
 	_, _, err := twilioClient.SendSMS(twilioPhoneNumber, phoneNumber, "Your OTP for registration is: "+otp, "", "")
+
 	return err
 }
 
@@ -52,6 +53,7 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 
 			// Send OTP to the user's mobile number
 			err := sendOTP(newuser.Mobile, otp)
+
 			if err != nil {
 				apierror := models.APIError{
 					Code:    http.StatusInternalServerError,
@@ -60,8 +62,7 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 				c.JSON(http.StatusInternalServerError, apierror)
 				return
 			}
-
-			// Return success response with the message to provide OTP
+			email.SendEmailAlert(newuser.Email, "Register API was called ", "Your OTP for registration is: "+otp)
 			c.JSON(http.StatusOK, gin.H{"message": "OTP sent. Please provide the OTP to complete registration."})
 			return
 		}
@@ -77,7 +78,6 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// Set the approved field to 0 (false) by default
 		newuser.Approved = 0
 
 		result := db.Table("users").Create(&newuser)
@@ -90,14 +90,10 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// Send email notifications
 		email.SendEmailAlert2("ad2491min@gmail.com", "ad2491min@gmail.com", "New user has just registered, please have a look at your pending Requests!", newuser.Username)
 		email.SendEmailAlert(newuser.Email, "Register API was called", "You have successfully registered. Please wait until the admin approves you.")
 
-		// Remove the OTP from the store after successful registration
 		delete(otpStore, newuser.Mobile)
-
-		// Return success response
 		c.JSON(http.StatusOK, newuser)
 	}
 }

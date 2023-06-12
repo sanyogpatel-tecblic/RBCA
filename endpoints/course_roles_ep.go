@@ -134,7 +134,7 @@ func GetReactTopicsHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		if user.Approved != 1 && user.Role != "react" {
+		if user.Approved != 1 && user.Role != "react" && user.Role != "admin" {
 			// Send email alert
 			email.SendEmailAlert(user.Email, "GetReactTopicsHandler API was Called....", "You do not have approval to access this feature. Please contact ADMINISTRATION for further process")
 

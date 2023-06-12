@@ -147,6 +147,10 @@ func GetAllRequests(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
 			return
 		}
+		if user.Role != "admin" {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+			return
+		}
 
 		// Retrieve the list of users where approved is 0
 		var users []models.User
