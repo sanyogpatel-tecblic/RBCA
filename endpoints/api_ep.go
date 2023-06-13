@@ -1,15 +1,18 @@
 package endpoints
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sanyogpatel-tecblic/RBCA/email"
+	"github.com/go-redis/redis"
 	"github.com/sanyogpatel-tecblic/RBCA/models"
 	"gorm.io/gorm"
 )
 
-func GetUserHandler(db *gorm.DB) gin.HandlerFunc {
+func GetUserHandler(db *gorm.DB, redisClient *redis.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Fetch the access token from the request header
 		accessToken := c.GetHeader("Authorization")
@@ -32,33 +35,58 @@ func GetUserHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		var user models.User
-		err = db.Where("id = ?", userID).First(&user).Error
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
+		// Check if the user data exists in Redis cache
+		// ctx := context.Background()
+		userData, err := redisClient.Get(userID).Result()
+		if err == nil {
+			// Cache hit: User data found in Redis
+			log.Println("Data retrieved from cache")
+
+			// Parse the cached data and return the response
+			var users []models.User
+			err = json.Unmarshal([]byte(userData), &users)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Fail to parse cached data"})
+				return
+			}
+			c.JSON(http.StatusOK, users)
+			return
+		} else if err != redis.Nil {
+			// Error occurred while accessing Redis
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to access Redis cache"})
 			return
 		}
 
-		if user.Approved != 1 && user.Role != "admin" {
-			// Send email alert
-			email.SendEmailAlert(user.Email, "GetUserHandler API was called.....", "You do not have approval to access this feature. Please contact ADMINISTRATION for further process")
+		// Cache miss: User data not found in Redis
+		log.Println("Data retrieved from the database")
 
-			c.JSON(http.StatusOK, gin.H{"message": "You do not have approval to access this feature. Please contact ADMINISTRATION for further process."})
-			return
-		}
-		if user.Role != "admin" && user.Role != "manager" {
-			email.SendEmailAlert(user.Email, "GetUserHandler API was called.....", "You are not allowed to access this feature. Please contact ADMINISTRATION for further asistance.")
-			c.JSON(http.StatusOK, gin.H{"message": "You are not allowed to access this feature. Please contact ADMINISTRATION for further process."})
-			return
-		}
-
-		// Retrieve the list of users from the database
+		// Query the database to retrieve the user data
 		var users []models.User
 		result := db.Find(&users)
 		if result.Error != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve users"})
 			return
 		}
+
+		// Cache the retrieved user data in Redis
+		usersData := convertUsersToJSON(users)
+		err = redisClient.Set(userID, usersData, time.Hour).Err()
+		if err != nil {
+			log.Println("Failed to cache user data:", err)
+		}
+
 		c.JSON(http.StatusOK, users)
 	}
+}
+
+func convertUsersToJSON(users []models.User) string {
+	// Convert users slice to JSON
+	jsonData, err := json.Marshal(users)
+	if err != nil {
+		log.Println("Failed to convert users to JSON:", err)
+		return ""
+	}
+
+	// Return the JSON representation of users
+	return string(jsonData)
 }

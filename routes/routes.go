@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
 	"github.com/sanyogpatel-tecblic/RBCA/endpoints"
 	"github.com/sanyogpatel-tecblic/RBCA/middleware"
 	"gorm.io/driver/postgres"
@@ -14,16 +15,22 @@ func Routes() {
 	dsn := "host=localhost user=postgres dbname=student password=root port=5432 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	router := gin.Default()
 
-	// // Apply RBAC to the endpoints
+	// Apply RBAC to the endpoints
 	// router.POST("/users", LoginHandler(db, []string{"admin"}), CreateUserHandler(db))
 	router.DELETE("/users/:id", endpoints.DeleteUsers(db))
-	router.GET("/users", middleware.AuthMiddleware(db), endpoints.GetUserHandler(db))
+	router.GET("/users", middleware.AuthMiddleware(db), endpoints.GetUserHandler(db, redisClient))
 	router.POST("/users", middleware.AuthMiddleware(db), endpoints.CreateUserHandler(db))
 	router.POST("/login", endpoints.LoginHandler(db), endpoints.CreateAccessTokenHandler)
 	router.POST("/register", endpoints.Register(db))
